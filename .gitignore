@@ -159,3 +159,6 @@ profile_default/
 site/
 
 data/
+data/img/
+models/
+task/

@@ -1,12 +1,10 @@
+import joblib
 import pandas as pd
-
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
-
-import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 file_name = 'data/diabetes_large_dataset.csv'
 data = pd.read_csv(file_name)
