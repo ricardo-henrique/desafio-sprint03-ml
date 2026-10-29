@@ -75,3 +75,13 @@ Obs: É normal que demore um pouco, dependendo da configuração do seu computad
 Será exibido no seu terminal o resultado do treinamento do modelo e será gerado os modelos na pasta `models/`
 
 para mais informações clique neste link [docs](/docs/model_testing.md)
+
+Antes do treinamento final, o script também avalia os modelos com validação cruzada
+Stratified K-Fold de 5 folds sobre os dados de treino. São exibidas as médias e os
+desvios padrão de acurácia, precisão, recall e F1-score ponderados. O conjunto de
+teste permanece separado para a avaliação final.
+
+Para a Random Forest, o script também executa uma busca aleatória de 30 combinações
+de hiperparâmetros usando os mesmos 5 folds e seleciona a combinação com melhor
+F1-score ponderado. O estimador selecionado é então avaliado no conjunto de teste
+e salvo como `models/model1_random_forest.pkl`.

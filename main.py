@@ -3,7 +3,13 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import (
+    RandomizedSearchCV,
+    StratifiedKFold,
+    cross_validate,
+    train_test_split,
+)
+from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 file_name = 'data/diabetes_large_dataset.csv'
@@ -48,15 +54,72 @@ X = X_managed.astype(float)
 
 X_training, X_test, y_training, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Mantém a proporção das classes em cada fold da validação cruzada.
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+scoring = {
+    'accuracy': 'accuracy',
+    'precision': 'precision_weighted',
+    'recall': 'recall_weighted',
+    'f1': 'f1_weighted',
+}
+
+# Compara os modelos nos dados de treino usando métricas ponderadas por classe.
+models_for_cv = {
+    'Random Forest (baseline)': RandomForestClassifier(random_state=42, n_estimators=100),
+    'Regressão Logística': make_pipeline(
+        StandardScaler(),
+        LogisticRegression(random_state=42, max_iter=1000),
+    ),
+}
+
+print("\nVALIDAÇÃO CRUZADA STRATIFIED K-FOLD (5 folds)")
+for model_name, estimator in models_for_cv.items():
+    cv_results = cross_validate(
+        estimator,
+        X_training,
+        y_training,
+        cv=cv,
+        scoring=scoring,
+        n_jobs=-1,
+    )
+    print(f"\n{model_name}:")
+    for metric in scoring:
+        scores = cv_results[f'test_{metric}']
+        print(f"  {metric.capitalize()}: {scores.mean():.4f} (+/- {scores.std():.4f})")
+
+# Espaço de busca dos hiperparâmetros testados para a Random Forest.
+rf_param_distributions = {
+    'n_estimators': [100, 200, 300, 400],
+    'max_depth': [None, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': ['sqrt', 'log2', 0.5],
+    'class_weight': [None, 'balanced', 'balanced_subsample'],
+}
+
+rf_search = RandomizedSearchCV(
+    estimator=RandomForestClassifier(random_state=42),
+    param_distributions=rf_param_distributions,
+    n_iter=30,
+    scoring='f1_weighted',
+    cv=cv,
+    random_state=42,
+    n_jobs=-1,
+)
+
+# Seleciona a combinação com melhor F1-score ponderado na validação cruzada.
+print("\nAjustando hiperparâmetros da Random Forest...")
+rf_search.fit(X_training, y_training)
+model1 = rf_search.best_estimator_
+print(f"Melhor F1-score ponderado na validação cruzada: {rf_search.best_score_:.4f}")
+print(f"Melhores hiperparâmetros: {rf_search.best_params_}")
 
 scaler = StandardScaler()
 X_training_scaled = scaler.fit_transform(X_training)
 X_test_scaled = scaler.transform(X_test)
 
-
 print("Treinando o modelo 1 (Random Forest)...")
-model1 = RandomForestClassifier(random_state=42, n_estimators=100)
-model1.fit(X_training, y_training)
+print("Usando o melhor estimador encontrado pela busca de hiperparâmetros.")
 
 print("treinando o model 2 (Regressão Logística)...")
 model2 = LogisticRegression(random_state=42, max_iter=1000)
