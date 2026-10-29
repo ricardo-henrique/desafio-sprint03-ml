@@ -89,18 +89,18 @@ for model_name, estimator in models_for_cv.items():
 
 # Espaço de busca dos hiperparâmetros testados para a Random Forest.
 rf_param_distributions = {
-    'n_estimators': [100, 200, 300, 400],
-    'max_depth': [None, 10, 20, 30],
+    'n_estimators': [100, 200],
+    'max_depth': [10, 20, None],
     'min_samples_split': [2, 5, 10],
     'min_samples_leaf': [1, 2, 4],
-    'max_features': ['sqrt', 'log2', 0.5],
+    'max_features': ['sqrt', 'log2'],
     'class_weight': [None, 'balanced', 'balanced_subsample'],
 }
 
 rf_search = RandomizedSearchCV(
     estimator=RandomForestClassifier(random_state=42),
     param_distributions=rf_param_distributions,
-    n_iter=30,
+    n_iter=10,
     scoring='f1_weighted',
     cv=cv,
     random_state=42,
