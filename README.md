@@ -54,7 +54,9 @@ pip install requirements.txt
 
 ## Preparação para treino de modelo
 
-Para treinar este modelo, primeiro é necessário baixar o dataset em formato .csv na plateforma do `kaggle` [diabetes dataset](https://www.kaggle.com/datasets/datascikhan/diabetes). É necessário que se cadastre na plataforma para conseguir baixar o dataset.
+Para treinar este modelo, primeiro é necessário baixar o dataset em formato .csv na plateforma do `kaggle` [diabetes dataset](https://www.kaggle.com/datasets/datascikhan/diabetes).
+
+> É necessário que se cadastre na plataforma para conseguir baixar o dataset.
 
 Após baixar o dataset, crie a pasta `data/` e armazene o arquivo .csv nesta pasta
 
